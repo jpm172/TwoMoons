@@ -1,10 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TextboxHandler : MonoBehaviour
 {
-     //makes a deep copy of the pageInfo list by copying the first/last character indices of each page into a 2d array
+
+    private TextMeshProUGUI tmp;
+
+    public string[] dialogueLines;
+    
+    [SerializeField] private int fontSize = 14;
+    [SerializeField] private float scrollSpeed = .1f;
+    [SerializeField] private bool skipScroll, isWaitingForPage;
+
+    private void Start()
+    {
+        tmp = GetComponent<TextMeshProUGUI>();
+    }
+
+    //makes a deep copy of the pageInfo list by copying the first/last character indices of each page into a 2d array
     private int[,] GetPageBoundaries( TextMeshProUGUI tmp )
     {
         int[,] result = new int[tmp.textInfo.pageCount,2];
@@ -23,17 +39,8 @@ public class TextboxHandler : MonoBehaviour
     
     IEnumerator TextScroll(string dialogue)
     {
-        // Scrolling will begin
-        inTextScrolling = true;
 
-        // Disable user input(click to next line)
-        GameManager.Instance.userInputEnabled = false;
-
-        // save current text speed
-        float textSpeedSaved = GameManager.Instance.textSpeed;
-        
-        TextMeshProUGUI tmp = dialogBox.transform.GetChild( 0 ).gameObject.GetComponent<TextMeshProUGUI>();
-        tmp.fontSize = GameManager.Instance.fontSize;
+        tmp.fontSize = fontSize;
         //Fill the text box and get the page boundaries
         tmp.text = dialogue;
         tmp.ForceMeshUpdate();
@@ -45,70 +52,32 @@ public class TextboxHandler : MonoBehaviour
         //scroll through each page
         for ( int n = 0; n < tmp.textInfo.pageCount; n++ )
         {
-            //Debug.Log( "Page " +n );
             //Scroll through the text on the nth page
             for ( int i = pageBoundaries[n,0]; i <= pageBoundaries[n,1]; i++ )
             {
-                //Debug.Log( "i " +i );
-                //if (scrollingSkip) GameManager.Instance.textSpeed = 1;      
+
                
-                if ( scrollingSkip )
+                if ( skipScroll )
                 {
                     tmp.maxVisibleCharacters = pageBoundaries[n,1];
                     break;
                 }
                 
                 tmp.maxVisibleCharacters = i;
-                yield return new WaitForSeconds( 1 - GameManager.Instance.textSpeed );
+                yield return new WaitForSeconds( 1 - scrollSpeed );
             }
-            
-            // if user clicked to skip scrolling effect; reset text speed for future lines
-            //not sure if its necessary to have this line in the page loop, but definitely need it at the very end
-            if (scrollingSkip == true)
-            {
-                // go through each sprite set duration to 1
-                foreach(Transform child in GameObject.Find("loadScene").gameObject.transform)
-                {
-                    if (child.name.Contains("charObject"))
-                    {
-                        child.GetComponent<Animated>()._totalDuration = 0;
-                    }
-                }
-                scrollingSkip = false;
-                GameManager.Instance.textSpeed = textSpeedSaved;
-            }
-            
+
             //wait for the player to switch page only if we aren't on the last page
             if ( n < tmp.textInfo.pageCount - 1 )
             {
                 isWaitingForPage = true;
                 yield return new WaitUntil( () => !isWaitingForPage );
                 tmp.pageToDisplay++;
-                scrollingSkip = false;
+                skipScroll = false;
             }
         }
         
         //set maxVisibleCharacters to the entire length so all characters are displayed
         tmp.maxVisibleCharacters = dialogue.Length;
-
-        // enable user input; scrolling has ended
-        GameManager.Instance.userInputEnabled = true;
-        // if user clicked to skip scrolling effect; reset text speed for future lines
-        if (scrollingSkip == true)
-        {
-            // go through each sprite set duration to 1
-            foreach(Transform child in GameObject.Find("loadScene").gameObject.transform)
-            {
-                if (child.name.Contains("charObject"))
-                {
-                    child.GetComponent<Animated>()._totalDuration = 0;
-                }
-            }
-            scrollingSkip = false;
-            GameManager.Instance.textSpeed = textSpeedSaved;
-        }
-        
-        
-        inTextScrolling = false; // text scrolling ended
     }
 }
