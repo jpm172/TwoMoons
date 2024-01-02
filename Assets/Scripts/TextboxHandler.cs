@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class TextboxHandler : MonoBehaviour
+public class TextBoxHandler : MonoBehaviour
 {
 
     private TextMeshProUGUI tmp;
 
     public string[] dialogueLines;
+    private int lineCount = 0;
     
     [SerializeField] private int fontSize = 14;
     [SerializeField] private float scrollSpeed = .1f;
@@ -18,8 +19,10 @@ public class TextboxHandler : MonoBehaviour
     private void Start()
     {
         tmp = GetComponent<TextMeshProUGUI>();
+        tmp.text = "";
     }
 
+    
     //makes a deep copy of the pageInfo list by copying the first/last character indices of each page into a 2d array
     private int[,] GetPageBoundaries( TextMeshProUGUI tmp )
     {
@@ -39,7 +42,6 @@ public class TextboxHandler : MonoBehaviour
     
     IEnumerator TextScroll(string dialogue)
     {
-
         tmp.fontSize = fontSize;
         //Fill the text box and get the page boundaries
         tmp.text = dialogue;
@@ -55,8 +57,6 @@ public class TextboxHandler : MonoBehaviour
             //Scroll through the text on the nth page
             for ( int i = pageBoundaries[n,0]; i <= pageBoundaries[n,1]; i++ )
             {
-
-               
                 if ( skipScroll )
                 {
                     tmp.maxVisibleCharacters = pageBoundaries[n,1];
@@ -64,7 +64,7 @@ public class TextboxHandler : MonoBehaviour
                 }
                 
                 tmp.maxVisibleCharacters = i;
-                yield return new WaitForSeconds( 1 - scrollSpeed );
+                yield return new WaitForSeconds( scrollSpeed );
             }
 
             //wait for the player to switch page only if we aren't on the last page
@@ -80,4 +80,12 @@ public class TextboxHandler : MonoBehaviour
         //set maxVisibleCharacters to the entire length so all characters are displayed
         tmp.maxVisibleCharacters = dialogue.Length;
     }
+
+
+    public void nextLine()
+    {
+        StartCoroutine( TextScroll( dialogueLines[lineCount] ) );
+        lineCount = (lineCount + 1)%dialogueLines.Length;
+    }
+    
 }
