@@ -2,27 +2,69 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 
 public class TextBoxHandler : MonoBehaviour
 {
-
-    private TextMeshProUGUI tmp;
-
+    
+    public RectTransform textBoxBG;
     public string[] dialogueLines;
+    public int fontSize = 14;
+    public float scrollSpeed = .1f;
+    public float timeToSize;
+    public bool skipScroll, isWaitingForPage;
+    public Controls playerControls;
+
+    private InputAction interactAction;
+    
+    private RectTransform textRect;
+    private TextMeshProUGUI tmp;
+    
+    private Coroutine currentTextBox;
     private int lineCount = 0;
     
-    [SerializeField] private int fontSize = 14;
-    [SerializeField] private float scrollSpeed = .1f;
-    [SerializeField] private bool skipScroll, isWaitingForPage;
+
+
+
+    private void Awake()
+    {
+        playerControls = new Controls();
+    }
+    
+    private void OnEnable()
+    {
+        interactAction = playerControls.Player.interact;
+        interactAction.Enable();
+        interactAction.performed += interact;
+    }
+
+    private void OnDisable()
+    {
+        interactAction.Disable();;
+    }
 
     private void Start()
     {
         tmp = GetComponent<TextMeshProUGUI>();
+        textRect = GetComponent<RectTransform>();
         tmp.text = "";
     }
 
-    
+
+    private void Update()
+    {
+
+    }
+
+
+    private void interact( InputAction.CallbackContext context )
+    {
+        Debug.Log( "interacted" );
+    }
+
     //makes a deep copy of the pageInfo list by copying the first/last character indices of each page into a 2d array
     private int[,] GetPageBoundaries( TextMeshProUGUI tmp )
     {
@@ -46,6 +88,9 @@ public class TextBoxHandler : MonoBehaviour
         //Fill the text box and get the page boundaries
         tmp.text = dialogue;
         tmp.ForceMeshUpdate();
+
+        StartCoroutine( resizeBackground(timeToSize) );
+        
         int[,] pageBoundaries = GetPageBoundaries( tmp );
         //set the characters to be invisible make sure were on page 1
         tmp.maxVisibleCharacters = 0;
@@ -79,13 +124,53 @@ public class TextBoxHandler : MonoBehaviour
         
         //set maxVisibleCharacters to the entire length so all characters are displayed
         tmp.maxVisibleCharacters = dialogue.Length;
+        currentTextBox = null;
     }
 
 
+    //Smoothly Resizes the backround image to fit the text box
+    //resizeTime: Time it takes in seconds to complete the transition (minimum of 0.01 seconds)
+    private IEnumerator resizeBackground(float resizeTime)
+    {
+        resizeTime = Mathf.Max( .01f, resizeTime );//prevent time values < 0
+
+        Vector2 spacing = new Vector2(20, 10);
+        
+        Vector2 startSize = textBoxBG.sizeDelta;
+        Vector2 pref = tmp.GetPreferredValues();
+        
+        Vector2 targetSize = new Vector2( Mathf.Min( pref.x, textRect.sizeDelta.x ), 
+                                        Mathf.Min( pref.y, textRect.sizeDelta.y ) );
+
+        targetSize += spacing;//add the spacing vector to make sure the words are bumping up with the edges of the background
+        
+        float timer = 0;
+        float progress = 0;
+        
+        while ( timer < 1 )
+        {
+            //use SmoothStep to ease from start to target size
+            progress = Mathf.SmoothStep( 0, 1, timer );
+            timer += Time.deltaTime*(1/resizeTime);
+            
+            textBoxBG.sizeDelta = Vector2.Lerp( startSize, targetSize, progress );
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        textBoxBG.sizeDelta = targetSize;
+
+    }
+    
     public void nextLine()
     {
-        StartCoroutine( TextScroll( dialogueLines[lineCount] ) );
-        lineCount = (lineCount + 1)%dialogueLines.Length;
+        if ( currentTextBox == null )
+        {
+            currentTextBox = StartCoroutine( TextScroll( dialogueLines[lineCount] ) );
+            lineCount = ( lineCount + 1 ) % dialogueLines.Length;
+        }
     }
+
+
     
 }
