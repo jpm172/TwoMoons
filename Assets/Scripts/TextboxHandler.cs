@@ -23,7 +23,7 @@ public class TextBoxHandler : MonoBehaviour
     private RectTransform textRect;
     private TextMeshProUGUI tmp;
     
-    private Coroutine currentTextBox;
+    private Coroutine currentTextCoroutine;
     private int lineCount = 0;
     
 
@@ -62,7 +62,14 @@ public class TextBoxHandler : MonoBehaviour
 
     private void interact( InputAction.CallbackContext context )
     {
-        Debug.Log( "interacted" );
+        if ( currentTextCoroutine != null )
+        {
+            skipScroll = true;
+        }
+        else
+        {
+            nextLine();
+        }
     }
 
     //makes a deep copy of the pageInfo list by copying the first/last character indices of each page into a 2d array
@@ -124,7 +131,8 @@ public class TextBoxHandler : MonoBehaviour
         
         //set maxVisibleCharacters to the entire length so all characters are displayed
         tmp.maxVisibleCharacters = dialogue.Length;
-        currentTextBox = null;
+        currentTextCoroutine = null;
+        skipScroll = false;
     }
 
 
@@ -147,7 +155,7 @@ public class TextBoxHandler : MonoBehaviour
         float timer = 0;
         float progress = 0;
         
-        while ( timer < 1 )
+        while ( timer < 1 && !skipScroll )
         {
             //use SmoothStep to ease from start to target size
             progress = Mathf.SmoothStep( 0, 1, timer );
@@ -164,11 +172,8 @@ public class TextBoxHandler : MonoBehaviour
     
     public void nextLine()
     {
-        if ( currentTextBox == null )
-        {
-            currentTextBox = StartCoroutine( TextScroll( dialogueLines[lineCount] ) );
-            lineCount = ( lineCount + 1 ) % dialogueLines.Length;
-        }
+        currentTextCoroutine = StartCoroutine( TextScroll( dialogueLines[lineCount] ) );
+        lineCount = ( lineCount + 1 ) % dialogueLines.Length;
     }
 
 
