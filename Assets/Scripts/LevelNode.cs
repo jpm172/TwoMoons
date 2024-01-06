@@ -5,11 +5,14 @@ using UnityEngine;
 public class LevelNode
 {
     [SerializeField] public string name;
-    public bool isLocation;
+    public bool isLocation, isIntersection;
 
     public Sprite sprite;
 
-    public LevelNode next, previous;
+    //going back when on a location should always EXIT a location, and cause player to turn around
+    //or have an exit direction assigned here for location nodes only?
+    public LevelNode forward, backward, left, right, lastNodeArrivedFrom;
+    
     
     public LevelNode( string newName, bool newIsLocation, Sprite newSprite )
     {
@@ -17,10 +20,27 @@ public class LevelNode
         isLocation = newIsLocation;
         sprite = newSprite;
     }
-    
-    
-    public bool isPathNode()
+
+    public LevelNode getNodeAt( int index )
     {
-        return !isLocation;
+        LevelNode node = this;
+
+        for ( int i = 0; i < index; i++ )
+        {
+            node = node.forward;
+        }
+
+        return node;
     }
+
+    
+}
+
+
+public class Path
+{
+    
+    public LevelNode forwardPath, returnPath ;
+
+
 }
