@@ -50,6 +50,8 @@ public class TextBoxHandler : MonoBehaviour
     {
         tmp = GetComponent<TextMeshProUGUI>();
         textRect = GetComponent<RectTransform>();
+        
+        textBoxBG.sizeDelta = Vector2.zero;
         tmp.text = "";
     }
 
@@ -96,7 +98,7 @@ public class TextBoxHandler : MonoBehaviour
         tmp.text = dialogue;
         tmp.ForceMeshUpdate();
 
-        StartCoroutine( resizeBackground(timeToSize) );
+        StartCoroutine( fitBackground(timeToSize) );
         
         int[,] pageBoundaries = GetPageBoundaries( tmp );
         //set the characters to be invisible make sure were on page 1
@@ -138,7 +140,7 @@ public class TextBoxHandler : MonoBehaviour
 
     //Smoothly Resizes the backround image to fit the text box
     //resizeTime: Time it takes in seconds to complete the transition (minimum of 0.01 seconds)
-    private IEnumerator resizeBackground(float resizeTime)
+    private IEnumerator fitBackground(float resizeTime)
     {
         resizeTime = Mathf.Max( .01f, resizeTime );//prevent time values < 0
 

@@ -8,7 +8,11 @@
       <e p="Assets" t="Include">
         <e p="Controls.cs" t="Include" />
         <e p="Scripts" t="Include">
+          <e p="CustomTextEffect.cs" t="Include" />
+          <e p="CustomTextEffectController.cs" t="Include" />
           <e p="DevTools.cs" t="Include" />
+          <e p="GameManager.cs" t="Include" />
+          <e p="LevelNode.cs" t="Include" />
           <e p="TextboxHandler.cs" t="Include" />
         </e>
         <e p="TextMesh Pro" t="Include">
