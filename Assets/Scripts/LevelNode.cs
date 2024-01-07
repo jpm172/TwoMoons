@@ -11,7 +11,7 @@ public class LevelNode
 
     //going back when on a location should always EXIT a location, and cause player to turn around
     //or have an exit direction assigned here for location nodes only?
-    public LevelNode forward, backward, left, right, lastNodeArrivedFrom;
+    public LevelNode forward, backward, left, right, lastNodeArrivedFrom, n1, n2;
     
     
     public LevelNode( string newName, bool newIsLocation, Sprite newSprite )

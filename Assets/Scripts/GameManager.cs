@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public Sprite[] LQ_Sprites, OBS_Sprites, OL_Sprites, Woods_Sprites, SNTY_Sprites, pathToSNTY_Sprites;
+    public Sprite[] LQ_Sprites, OBS_Sprites, OL_Sprites, WoodsToPath_Sprites, pathToWoods_Sprites, SNTY_Sprites, pathToSNTY_Sprites;
     public Image gameImage, forwardArrow, backwardArrow, leftArrow, rightArrow;
     
     
@@ -61,7 +61,6 @@ public class GameManager : MonoBehaviour
     }
     
     
-    // Update is called once per frame
     void Update()
     {
         
@@ -74,17 +73,14 @@ public class GameManager : MonoBehaviour
         LevelNode livingQuarters = new LevelNode( "Living Quarters", true, LQ_Sprites[0]  );
         LevelNode observatory = new LevelNode( "Observatory", true, OBS_Sprites[0] );
         LevelNode overlook = new LevelNode( "Overlook", true, OL_Sprites[0] );
-        LevelNode woods = new LevelNode( "Woods", true, Woods_Sprites[0] );
+        LevelNode woods = new LevelNode( "Woods", true, WoodsToPath_Sprites[0] );
         LevelNode sanctuary = new LevelNode( "Sanctuary", true, SNTY_Sprites[0] );
 
         createPath( livingQuarters, observatory, LQ_Sprites.Skip( 1 ).ToArray(), OBS_Sprites.Skip( 1 ).ToArray() );
-        //createPath( overlook, woods, OL_Sprites.Skip( 1 ).ToArray() );
-        //createPath( woods, overlook, Woods_Sprites.Skip( 1 ).ToArray() );
-        //createPath( sanctuary, null, SNTY_Sprites.Skip( 1 ).ToArray() );
 
-        //createBranch( livingQuarters, 4,true, sanctuary, pathToSNTY_Sprites );
-        //createIntersection( livingQuarters, 2, overlook, 1, woods, 3 );
-        //createIntersection( observatory, 4, woods, overlook );
+        createBranch( livingQuarters, 4, observatory, 2, sanctuary, SNTY_Sprites.Skip( 1 ).ToArray(), pathToSNTY_Sprites );
+        createBranch( livingQuarters, 2, observatory, 4, woods, WoodsToPath_Sprites.Skip( 1 ).ToArray(), pathToWoods_Sprites.Skip( 1 ).ToArray() );
+        createBranch(  observatory, 4, livingQuarters, 2,overlook, null, null );
         
         level.Add( livingQuarters );
         level.Add( observatory );
@@ -97,80 +93,146 @@ public class GameManager : MonoBehaviour
         updateMovementIndicators();
     }
 
-    /*
-    private void createBranch(Path originPath, int originIndex, bool isRight, LevelNode branchLocation, Sprite[] pathSprites )
+    //Overloaded version of createBranch for when there is only one step from node to branch
+    private void createBranch( LevelNode leftLocation, int leftNodeIndex, LevelNode rightLocation, int rightNodeIndex, LevelNode branchLocation )
     {
-        LevelNode originNode = originLocation.getNodeAt( originIndex );
-        originNode.isIntersection = true;
-
-        LevelNode[] forwardPath = new LevelNode[pathSprites.Length];
+        LevelNode leftNode = leftLocation.getNodeAt( leftNodeIndex );
+        LevelNode rightNode = rightLocation.getNodeAt( rightNodeIndex );
         
+        Debug.Log( rightNode.isIntersection );
         
-        for ( int i = 0; i < pathSprites.Length; i++ )
-        {
-            forwardPath[i] = new LevelNode( i.ToString(), false, pathSprites[i] );
-            if ( i > 0 )
-            {
-                forwardPath[i - 1].forward = forwardPath[i];
-                forwardPath[i].backward = forwardPath[i - 1];
-            }
-        }
-
-
-        forwardPath[0].backward = originLocation;
-        forwardPath[forwardPath.Length - 1].forward = branchLocation;
-        
-
-        if ( isRight )
-            originNode.right = forwardPath[0];
-        else
-            originNode.left = forwardPath[0];
-
-
-
-    }
-    */
-    private void createIntersection(LevelNode mainLocation, int mainIndex, LevelNode leftLocation, int leftIndex, LevelNode rightLocation, int rightIndex)
-    {
-        LevelNode mainNode = mainLocation.forward;
-        for ( int i = 1; i < mainIndex; i++ )
-        {
-            if ( mainNode.isLocation )
-            {
-                Debug.LogError( "Intersecting node out of bounds" );
-                break;
-            }
-            mainNode = mainNode.forward;
-        }
-
-
-        LevelNode leftNode = leftLocation.forward;
-        for ( int i = 1; i < leftIndex; i++ )
-        {
-            if ( leftNode.isLocation )
-            {
-                Debug.LogError( "Intersecting node out of bounds" );
-                break;
-            }
-            leftNode = leftNode.forward;
-        }
-        
-        LevelNode rightNode = rightLocation.forward;
-        for ( int i = 1; i < rightIndex; i++ )
-        {
-            if ( rightNode.isLocation )
-            {
-                Debug.LogError( "Intersecting node out of bounds" );
-                break;
-            }
-            rightNode = rightNode.forward;
-        }
-        
-
-        mainNode.isIntersection = true;
         leftNode.isIntersection = true;
         rightNode.isIntersection = true;
+        
+        branchLocation.left = rightNode;
+        branchLocation.right = leftNode;
+
+        rightNode.left = branchLocation;
+        leftNode.right = branchLocation;
+
+        if ( leftNode.n1 != null )
+        {
+            branchLocation.backward = leftNode.n2;
+            leftNode.n2.backward = branchLocation;
+
+            leftNode.n1.forward = branchLocation;
+
+        }
+        
     }
+
+    
+    private void createBranch( LevelNode leftLocation, int leftNodeIndex, LevelNode rightLocation, int rightNodeIndex, LevelNode branchLocation, Sprite[] forwardSprites, Sprite[] backwardSprites )
+    {
+        LevelNode leftNode = leftLocation.getNodeAt( leftNodeIndex );
+        LevelNode rightNode = rightLocation.getNodeAt( rightNodeIndex );
+
+        leftNode.isIntersection = true;
+        rightNode.isIntersection = true;
+
+        
+        
+
+
+        if ( forwardSprites != null )
+        {
+            LevelNode[] forwardPath = new LevelNode[forwardSprites.Length];
+            for ( int i = 0; i < forwardSprites.Length; i++ )
+            {
+                forwardPath[i] = new LevelNode( i.ToString(), false, forwardSprites[i] );
+                if ( i > 0 )
+                {
+                    forwardPath[i - 1].forward = forwardPath[i];
+                    forwardPath[i].backward = forwardPath[i - 1];
+                }
+            }
+            
+            branchLocation.forward = forwardPath[0];
+            forwardPath[0].backward = branchLocation;
+            
+            forwardPath[forwardPath.Length - 1].left = rightNode;
+            forwardPath[forwardPath.Length - 1].right = leftNode;
+            
+            rightNode.n1 = forwardPath[forwardPath.Length - 1];
+
+            if ( leftNode.n1 != null )
+            {
+                leftNode.n1.forward = forwardPath[forwardPath.Length - 1];
+            }
+
+        }
+        else//no forwards path == skip from path to branch location
+        {
+            rightNode.left = branchLocation;
+            leftNode.right = branchLocation;
+
+            rightNode.n1 = branchLocation;
+            if ( leftNode.n1 != null )
+            {
+                leftNode.n1.forward = branchLocation;
+
+            }
+        }
+
+
+        if ( backwardSprites != null )
+        {
+            LevelNode[] backwardPath = new LevelNode[backwardSprites.Length];
+            for ( int i = 0; i < backwardSprites.Length; i++ )
+            {
+                backwardPath[i] = new LevelNode( i.ToString(), false, backwardSprites[i] );
+                if ( i > 0 )
+                {
+                    backwardPath[i - 1].forward = backwardPath[i];
+                    backwardPath[i].backward = backwardPath[i - 1];
+                }
+            }
+            
+            backwardPath[0].right = rightNode;
+            backwardPath[0].left = leftNode;
+            backwardPath[backwardPath.Length - 1].forward = branchLocation;
+
+            rightNode.left = backwardPath[0];
+            leftNode.right = backwardPath[0];
+            
+            rightNode.n2 = backwardPath[0];
+
+            if ( leftNode.n1 != null )
+            {
+                backwardPath[backwardPath.Length - 1] = leftNode.n2;
+                leftNode.n2.backward = backwardPath[backwardPath.Length - 1];
+            }
+
+        }
+        else//no backwards path == skip from branch location to path
+        {
+            branchLocation.right = rightNode;
+            branchLocation.left = leftNode;
+
+            rightNode.n2 = branchLocation;
+
+
+            if ( leftNode.n1 != null )
+            {
+                branchLocation.backward = leftNode.n2;
+                leftNode.n2.backward = branchLocation;
+            }
+        }
+
+
+        if ( leftNode.n1 != null )
+        {
+            //branchLocation.backward = leftNode.n2;
+            //leftNode.n2.backward = branchLocation;
+
+            //leftNode.n1.forward = branchLocation;
+
+        }
+        
+
+    }
+    
+    
     
     //Will create the forward path between a start and end location by creating a linked list between the 2 locations
     //startNode: the starting location
