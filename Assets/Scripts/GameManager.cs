@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public Sprite[] LQ_Sprites, OBS_Sprites, OL_Sprites, WoodsToPath_Sprites, pathToWoods_Sprites, SNTY_Sprites, pathToSNTY_Sprites;
+    public Sprite[] loadedSprites;
+    public Sprite mainLQ, mainOBS;
     public Image gameImage, forwardArrow, backwardArrow, leftArrow, rightArrow;
     
     
@@ -69,6 +71,8 @@ public class GameManager : MonoBehaviour
     public void initiateLevel()
     {
         level = new List<LevelNode>();
+
+        loadResources();
         
         LevelNode livingQuarters = new LevelNode( "Living Quarters", true, LQ_Sprites[0]  );
         LevelNode observatory = new LevelNode( "Observatory", true, OBS_Sprites[0] );
@@ -91,6 +95,11 @@ public class GameManager : MonoBehaviour
         curNode = livingQuarters;
         gameImage.sprite = curNode.sprite;
         updateMovementIndicators();
+    }
+
+    private void loadResources()
+    {
+        //loadedSprites =  Resources.LoadAll<Sprite>( "Sprites/Living Quarters/Main Sprites" );
     }
 
     //Overloaded version of createBranch for when there is only one step from node to branch

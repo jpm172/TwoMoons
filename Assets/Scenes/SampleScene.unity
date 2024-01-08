@@ -831,19 +831,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LQ_Sprites:
-  - {fileID: 21300000, guid: 8819d7e624a2a904bb9cd761e228f721, type: 3}
-  - {fileID: 21300000, guid: 8f89672b8f28cd74096bb5e69e8cbe6d, type: 3}
-  - {fileID: 21300000, guid: 8cf4449f643ed5e4fac67ff2c74c9bfb, type: 3}
-  - {fileID: 21300000, guid: d9ff947db68fce84eb21a08da9b98eb5, type: 3}
-  - {fileID: 21300000, guid: d8c85e5b86b335b438ae5195496bc340, type: 3}
-  - {fileID: 21300000, guid: 78262c416b4212d4ba3f75c1c9725166, type: 3}
+  - {fileID: 21300000, guid: 47f608ce135c7e4478733f1e15a27765, type: 3}
+  - {fileID: 21300000, guid: bc3c81c96dbbefa40812a514de24f87c, type: 3}
+  - {fileID: 21300000, guid: e6c564a80014d404a89abce0861fa3df, type: 3}
+  - {fileID: 21300000, guid: 78bac940a6b84034f9fd8e4fed70cd33, type: 3}
+  - {fileID: 21300000, guid: 635619459c6cd5c4c86daa53d37261d1, type: 3}
+  - {fileID: 21300000, guid: a32645bd5f8a9d244ac7f171da54f02d, type: 3}
   OBS_Sprites:
-  - {fileID: 21300000, guid: 1f701194e8f6010408ec4c5ad2d185fc, type: 3}
-  - {fileID: 21300000, guid: 4bdf98e92bb8fbc46b74369579068bb3, type: 3}
-  - {fileID: 21300000, guid: 2e03cb50e4a1980468b89440b21a15ea, type: 3}
-  - {fileID: 21300000, guid: b2cb49e0b7c5f9b479c8111f8a8ca037, type: 3}
-  - {fileID: 21300000, guid: c0ba5ad3c4777de49b8638569b5a60c7, type: 3}
-  - {fileID: 21300000, guid: 041762dadb18505449ec7fbc09ce0a21, type: 3}
+  - {fileID: 21300000, guid: be744728387ebc04caf15ca5e072e7cd, type: 3}
+  - {fileID: 21300000, guid: 6d881cff870b5f54e90058370c380ac7, type: 3}
+  - {fileID: 21300000, guid: 1516ec696ada8274bbe85aa240d4381b, type: 3}
+  - {fileID: 21300000, guid: 587755d23d4ecf3489b041362bee8607, type: 3}
+  - {fileID: 21300000, guid: 1371628ff00976e4c8141bff2a608820, type: 3}
+  - {fileID: 21300000, guid: ed811a033801df042af2864a8ed68c8b, type: 3}
   OL_Sprites:
   - {fileID: 21300000, guid: 0f6569317cf114a4cb8dbeafc0e454a0, type: 3}
   WoodsToPath_Sprites:
@@ -859,6 +859,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7a4bbb373322fe84b8592abb54b3af11, type: 3}
   pathToSNTY_Sprites:
   - {fileID: 21300000, guid: db2c26247ae70ff4cb4e395ad932363c, type: 3}
+  loadedSprites: []
   gameImage: {fileID: 1573051209}
   forwardArrow: {fileID: 791202315}
   backwardArrow: {fileID: 404763389}
@@ -883,7 +884,7 @@ GameObject:
   - component: {fileID: 1573051209}
   - component: {fileID: 1573051210}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Game Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
