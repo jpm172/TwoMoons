@@ -10,10 +10,15 @@ public class MoonTrackerGame : MonoBehaviour
 
     private GameManager game;
     private Sprite newMoon, waxingCrescent, firstQuarter, waxingGibbous, fullMoon, waningGibbous, thirdQuarter, waningCrescent;
-    public Sprite[] phases;
+    private Sprite[] phases;
 
-    public GameObject gamePiece, heldPiece;
+    public GameObject gamePiece, heldPiece, playArea, phasePanel;
     private Vector3 offset;
+
+
+    private Controls playerControls;
+    private InputAction mouseAction;
+    
     
     // Start is called before the first frame update
     void Start()
@@ -22,27 +27,37 @@ public class MoonTrackerGame : MonoBehaviour
         loadResources();
     }
     
+    private void Awake()
+    {
+        playerControls = new Controls();
+    }
+
+    private void OnEnable()
+    {
+        mouseAction = playerControls.Player.Mouse;
+        mouseAction.Enable();
+    }
+    
+    private void OnDisable()
+    {
+        mouseAction = playerControls.Player.Mouse;
+    }
 
     // Update is called once per frame
     void Update()
     {
-        /*
+        //whenever the mouse button is released, try and release any game pieces held
+        if ( mouseAction.WasReleasedThisFrame() )
+        {
+            ReleaseMoon();
+        }
+        
+        //Have the held game piece follow the mouse
         if ( heldPiece != null )
         {
             heldPiece.transform.position = Input.mousePosition + offset;
-            Debug.Log( heldPiece.GetComponent<RectTransform>().anchoredPosition.magnitude );
         }
-        */
-        
-        
-        if ( heldPiece != null )
-        {
-            heldPiece.transform.position = Input.mousePosition + offset;
-            //Debug.Log( heldPiece.GetComponent<RectTransform>().anchoredPosition.magnitude );
-        }
-            
-        Debug.Log( Input.mousePosition/GetComponentInParent<Canvas>().scaleFactor );
-        //Debug.Log( GetComponent<Canvas>().scaleFactor );
+
     }
 
     private void loadResources()
@@ -77,36 +92,67 @@ public class MoonTrackerGame : MonoBehaviour
 
     public void ReleaseMoon()
     {
-        if ( heldPiece.GetComponent<RectTransform>().anchoredPosition.y > -110 )
+        //if there is a held game piece and it is being released in the delete area (the moon phase panel) outside the defined play area, delete the game piece
+        if ( heldPiece != null && (isInDeleteArea() || !isInPlayArea() ) )
         {
             Destroy( heldPiece );
         }
         heldPiece = null;
     }
 
+    //returns true if the game piece is within the bounds of the moon phase panel, false otherwise
+    private bool isInDeleteArea()
+    {
+        //make sure both rects are in the same relative space so that Overlaps() works correctly
+        Rect gamePieceRect = heldPiece.GetComponent<RectTransform>().GetWorldRect();
+        Rect phasePanelRect = phasePanel.GetComponent<RectTransform>().GetWorldRect();
 
+        return phasePanelRect.Overlaps( gamePieceRect  );
+    }
+    
+    //returns true if the game piece is within the bounds of the defined play area, false otherwise
+    private bool isInPlayArea()
+    {
+        Rect gamePieceRect = heldPiece.GetComponent<RectTransform>().GetWorldRect();
+        Rect playAreaRect = playArea.GetComponent<RectTransform>().GetWorldRect();
+
+        return playAreaRect.Overlaps( gamePieceRect  );
+    }
+
+    //spawns a game piece and assigns its sprite and events necessary to funciton
+    //Phase: integer representing what moon phase was selected
     public void SelectedMoon(int phase)
     {
         Debug.Log( "selected moon phase " + phase );
-        GameObject newGamePiece = Instantiate( gamePiece, Input.mousePosition, Quaternion.identity, transform );
+        //spawn the game piece parented to the play area and set its sprite
+        GameObject newGamePiece = Instantiate( gamePiece, Input.mousePosition, Quaternion.identity, playArea.transform );
         newGamePiece.GetComponent<Image>().sprite = phases[phase];
         
-        EventTrigger trigger = newGamePiece.GetComponent<EventTrigger>();
-        
         //add the trigger event for picking up the piece on player click
+        EventTrigger trigger = newGamePiece.GetComponent<EventTrigger>();
+
         EventTrigger.Entry entry2 = new EventTrigger.Entry();
         entry2.eventID = EventTriggerType.PointerDown;
         entry2.callback.AddListener((data) => { PickUpMoon( newGamePiece ); });
         trigger.triggers.Add(entry2);
-        
-        
-        //add trigger event for release the piece when letting go of click
-        EventTrigger.Entry entry = new EventTrigger.Entry();
-        entry.eventID = EventTriggerType.Drop;
-        entry.callback.AddListener((data) => { ReleaseMoon(); });
-        trigger.triggers.Add(entry);
 
-
+        //then call PickUpMoon so everything is updated properly
         PickUpMoon( newGamePiece );
+    }
+}
+
+
+//helper function to get a RectTransform in worldspace
+public static class RectTransformExtensions
+{
+    public static Rect GetWorldRect(this RectTransform rectTransform)
+    {
+        var localRect = rectTransform.rect;
+
+        return new Rect
+        {
+            min = rectTransform.TransformPoint(localRect.min),
+            max = rectTransform.TransformPoint(localRect.max)
+        };
     }
 }

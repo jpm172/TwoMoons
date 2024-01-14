@@ -71,6 +71,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Mouse"",
+                    ""type"": ""Button"",
+                    ""id"": ""71dbca2c-3ee9-444e-8484-4689c431feae"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -172,6 +181,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""Move Right"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba99e9db-9aa7-458c-b814-777d5c26e0c5"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Mouse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -213,6 +233,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_MoveBackward = m_Player.FindAction("Move Backward", throwIfNotFound: true);
         m_Player_MoveLeft = m_Player.FindAction("Move Left", throwIfNotFound: true);
         m_Player_MoveRight = m_Player.FindAction("Move Right", throwIfNotFound: true);
+        m_Player_Mouse = m_Player.FindAction("Mouse", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
@@ -280,6 +301,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MoveBackward;
     private readonly InputAction m_Player_MoveLeft;
     private readonly InputAction m_Player_MoveRight;
+    private readonly InputAction m_Player_Mouse;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -289,6 +311,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @MoveBackward => m_Wrapper.m_Player_MoveBackward;
         public InputAction @MoveLeft => m_Wrapper.m_Player_MoveLeft;
         public InputAction @MoveRight => m_Wrapper.m_Player_MoveRight;
+        public InputAction @Mouse => m_Wrapper.m_Player_Mouse;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -313,6 +336,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @MoveRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMoveRight;
                 @MoveRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMoveRight;
                 @MoveRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMoveRight;
+                @Mouse.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse;
+                @Mouse.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse;
+                @Mouse.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMouse;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -332,6 +358,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @MoveRight.started += instance.OnMoveRight;
                 @MoveRight.performed += instance.OnMoveRight;
                 @MoveRight.canceled += instance.OnMoveRight;
+                @Mouse.started += instance.OnMouse;
+                @Mouse.performed += instance.OnMouse;
+                @Mouse.canceled += instance.OnMouse;
             }
         }
     }
@@ -376,6 +405,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnMoveBackward(InputAction.CallbackContext context);
         void OnMoveLeft(InputAction.CallbackContext context);
         void OnMoveRight(InputAction.CallbackContext context);
+        void OnMouse(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
