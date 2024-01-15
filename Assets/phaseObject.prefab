@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5070317029267214977}
   - component: {fileID: 7308285696217321244}
   - component: {fileID: 4577410857722558789}
+  - component: {fileID: 3651410337503650528}
   m_Layer: 5
   m_Name: phaseObject
   m_TagString: Untagged
@@ -36,8 +37,8 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 268.94995, y: -94.29999}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -146,3 +147,15 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &3651410337503650528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288442389777577153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c4c2e43cef68754f901ba1e141490af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

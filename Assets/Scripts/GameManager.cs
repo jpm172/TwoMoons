@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public Image gameImage, forwardArrow, backwardArrow, leftArrow, rightArrow;
 
     public int moonCount;
-    public Vector2[] moonPositions;
+    public Vector3[] moonPositions;
     public int[] moonPhases;
     
     public List< LevelNode > level;
@@ -117,12 +117,12 @@ public class GameManager : MonoBehaviour
     private void initializeMoons()
     {
         moonPhases = new int[moonCount];
-        moonPositions = new Vector2[moonCount];
+        moonPositions = new Vector3[moonCount];
         
         for ( int i = 0; i < moonCount; i++ )
         {
             moonPhases[i] = Random.Range( 0, 7 );
-            moonPositions[i] = new Vector2(Random.Range( -50, 50 ), Random.Range( -50, 50 ) );
+            moonPositions[i] = new Vector2(Random.Range( -150, 150 ), Random.Range( -150, 150 ) );
         }
     }
     
