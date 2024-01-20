@@ -8,12 +8,16 @@
       <e p="Assets" t="Include">
         <e p="Controls.cs" t="Include" />
         <e p="Scripts" t="Include">
+          <e p="Action.cs" t="Include" />
+          <e p="ActionButtonInfo.cs" t="Include" />
           <e p="CustomTextEffect.cs" t="Include" />
           <e p="CustomTextEffectController.cs" t="Include" />
           <e p="DevTools.cs" t="Include" />
+          <e p="FM_Game.cs" t="Include" />
           <e p="GameManager.cs" t="Include" />
           <e p="GamePiece.cs" t="Include" />
           <e p="LevelNode.cs" t="Include" />
+          <e p="Minigame.cs" t="Include" />
           <e p="MoonTrackerGame.cs" t="Include" />
           <e p="RectTransformExtensions.cs" t="Include" />
           <e p="Task.cs" t="Include" />

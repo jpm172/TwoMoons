@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -9,15 +10,20 @@ public class GameManager : MonoBehaviour
 {
     public Sprite[] LQ_to_OBS, OBS_to_LQ, OL_to_path, path_to_OL, woods_to_path, path_to_woods, SNTY_to_path, path_to_SNTY;
     public Sprite LQ_Main, OBS_Main, Woods_Main, OL_Main, SNTY_Main;
+    public GameObject locationUI, movementUI, actionButton, actionBox;
     public Image gameImage, forwardArrow, backwardArrow, leftArrow, rightArrow;
-
-    public int moonCount;
+    public Action OL_Game;
+    
+    public int moonCount, day;
     public Vector3[] moonPositions;
     public int[] moonPhases;
     
-    public List< LevelNode > level;
-    [SerializeField]private LevelNode playerPosition;
+    [SerializeField]private List<LevelNode> level;
+    [SerializeField]private List<Action> tasks;
+    [SerializeField]private LevelNode playerPosition, prevPlayerPosition;
     private TaskWindow task_window;
+
+    private List<Button> actionButtonList;
     
     private Controls playerControls;
 
@@ -28,7 +34,10 @@ public class GameManager : MonoBehaviour
     {
         gameImage.enabled = true;
         task_window = GetComponentInChildren<TaskWindow>();
+        locationUI.GetComponent<Canvas>().enabled = false ;
         moonCount = 2;
+        actionButtonList = new List<Button>();
+        tasks = new List<Action>();
         initiateLevel();
     }
 
@@ -45,7 +54,7 @@ public class GameManager : MonoBehaviour
         moveBackAction = playerControls.Player.MoveBackward;
         moveLeftAction = playerControls.Player.MoveLeft;
         moveRightAction = playerControls.Player.MoveRight;
-        
+
         moveForwardAction.Enable();
         moveBackAction.Enable();
         moveLeftAction.Enable();
@@ -86,14 +95,12 @@ public class GameManager : MonoBehaviour
         LevelNode woods = new LevelNode( "Woods", true, Woods_Main );
         LevelNode sanctuary = new LevelNode( "Sanctuary", true, SNTY_Main );
         
+        //assign actions/tasks
+        OL_Game.IsAvailable = true;
+        overlook.AddAction( OL_Game );
+        AddTask(OL_Game);
         
         //Create the paths between the locations
-        //createPath( livingQuarters, LQ_to_OBS );
-        //createPath( observatory, OBS_to_LQ );
-        //createPath( woods, woods );
-        
-        //connectPath( livingQuarters, observatory, livingQuarters.getTail(), observatory.getTail(),  'F' );
-        //connectPath( livingQuarters );
         createPath( livingQuarters, observatory, LQ_to_OBS, OBS_to_LQ );
 
         createBranch( livingQuarters, 4, observatory, 2, sanctuary, SNTY_to_path, path_to_SNTY );
@@ -110,9 +117,20 @@ public class GameManager : MonoBehaviour
         //set the player's starting position to be the living quarters
         playerPosition = livingQuarters;
         gameImage.sprite = playerPosition.sprite;
-        updateMovementIndicators();
-        //task_window.initializeTasks();
+        PlayerMoved();
     }
+
+    private void AddTask( Action task)
+    {
+        tasks.Add( task );
+    }
+
+    private void ResetTasks()
+    {
+        tasks.Clear();
+    }
+
+
 
     private void initializeMoons()
     {
@@ -128,8 +146,6 @@ public class GameManager : MonoBehaviour
     
     private void loadResources()
     {
-        //loadedSprites =  Resources.LoadAll<Sprite>( "Sprites/Living Quarters/Main Sprites" );
-
         //load all the main sprites
         LQ_Main = Resources.Load<Sprite>( "Sprites/Living Quarters/Main/Living Quarters-Main" );
         OBS_Main = Resources.Load<Sprite>( "Sprites/Observatory/Main/Observatory-Main" );
@@ -367,7 +383,7 @@ public class GameManager : MonoBehaviour
 
 
     //Will set the opacity of the movement indicators to represent whether the player can move in a certain direction
-    private void updateMovementIndicators()
+    private void UpdateMovementIndicators()
     {
         Color imgColor = forwardArrow.color;
         
@@ -383,37 +399,121 @@ public class GameManager : MonoBehaviour
         imgColor.a = playerPosition.right != null ? 1 : .3f;
         rightArrow.color = imgColor;
     }
+
+    private void PlayerMoved()
+    {
+        //switches the movement and action box UI's when moving between a path and a location
+        movementUI.GetComponent<Canvas>().enabled = !playerPosition.isLocation;
+        locationUI.GetComponent<Canvas>().enabled = playerPosition.isLocation;
+        locationUI.GetComponent<CanvasGroup>().interactable = playerPosition.isLocation;
+        
+        if ( playerPosition.isLocation )
+        {
+            moveForwardAction.Disable();
+            
+            //Create all the action buttons for this location and store them in a list
+            foreach ( Action a in playerPosition.GetActions() )
+            {
+                Button newButton = Instantiate( actionButton, Vector3.zero, Quaternion.identity, actionBox.transform ).GetComponent<Button>();
+                newButton.onClick.AddListener( a.StartAction );
+                newButton.GetComponentInChildren<TextMeshProUGUI>().text = a.actionName;
+                newButton.GetComponent<ActionButtonInfo>().actionReference = a;
+
+                actionButtonList.Add( newButton );
+            }
+            
+            UpdateActions();
+        }
+        
+        
+        UpdateMovementIndicators();
+    }
+
+    
+    public void UpdateActions()
+    {
+        foreach ( Button b in actionButtonList )
+        {
+            Action buttonAction = b.GetComponent<ActionButtonInfo>().actionReference;
+            TextMeshProUGUI buttonText = b.GetComponentInChildren<TextMeshProUGUI>();
+            if ( !buttonAction.IsAvailable )
+            {
+                b.interactable = false;
+                buttonText.fontStyle = FontStyles.Strikethrough;
+                buttonText.alpha = .5f;
+            }
+            else
+            {
+                b.interactable = true;
+                buttonText.fontStyle = FontStyles.Normal;
+                buttonText.alpha = 1;
+            }
+        }
+    }
+    
+    //ExitLocation will force the player into the forward node and wipe all the buttons
+    public void ExitLocation()
+    {
+        //Debug.Log( "Exit" );
+        //destroy all buttons in the button list. This is done to prevent accidentally deleting the exit button which would soft lock the game
+        foreach ( Button b in actionButtonList )
+        {
+            Destroy( b.gameObject );
+        }
+        actionButtonList.Clear();
+        
+        
+        moveForwardAction.Enable();
+        playerPosition = playerPosition.forward;
+        gameImage.sprite = playerPosition.sprite;
+        PlayerMoved();
+    }
     
     public void moveForward( InputAction.CallbackContext context )
     {
         if ( playerPosition.forward != null )
         {
             //Debug.Log( "Move Forward" );
+            prevPlayerPosition = playerPosition;
             playerPosition = playerPosition.forward;
             gameImage.sprite = playerPosition.sprite;
-            updateMovementIndicators();
+            PlayerMoved();
         }
     }
 
     public void moveBackward( InputAction.CallbackContext context )
     {
+        //if at a location, ignore movement inputs
+        if ( playerPosition.isLocation )
+        {
+            return;
+        }
+        
         if ( playerPosition.backward != null )
         {
             //Debug.Log( "Move Back" );
+            prevPlayerPosition = playerPosition;
             playerPosition = playerPosition.backward;
             gameImage.sprite = playerPosition.sprite;
-            updateMovementIndicators();
+            PlayerMoved();
         }
     }
 
     public void moveLeft( InputAction.CallbackContext context )
     {
+        //if at a location, ignore movement inputs
+        if ( playerPosition.isLocation )
+        {
+            return;
+        }
+        
         if ( playerPosition.left != null )
         {
             //Debug.Log( "Move Left" );
+            prevPlayerPosition = playerPosition;
             playerPosition = playerPosition.left;
             gameImage.sprite = playerPosition.sprite;
-            updateMovementIndicators();
+            PlayerMoved();
         }
         
         
@@ -421,14 +521,22 @@ public class GameManager : MonoBehaviour
 
     public void moveRight( InputAction.CallbackContext context )
     {
+        //if at a location, ignore movement inputs
+        if ( playerPosition.isLocation )
+        {
+            return;
+        }
+        
         if ( playerPosition.right != null )
         {
             //Debug.Log( "Move Right" );
+            prevPlayerPosition = playerPosition;
             playerPosition = playerPosition.right;
             gameImage.sprite = playerPosition.sprite;
-            updateMovementIndicators();
+            PlayerMoved();
         }
     }
 
 
+    public List<Action> Tasks => tasks;
 }

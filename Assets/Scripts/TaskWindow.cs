@@ -5,30 +5,16 @@ using UnityEngine;
 
 public class TaskWindow : MonoBehaviour
 {
+    private GameManager game;
     public GameObject taskContainer;
-    public List<Task> taskList;
+    //public List<Task> taskList;
     
     private TextMeshProUGUI[] textSlots;
     // Start is called before the first frame update
     void Start()
     {
         textSlots = taskContainer.GetComponentsInChildren<TextMeshProUGUI>();
-    }
-
-    public void initializeTasks()
-    {
-        Debug.Log( "Init tasks" );
-        ResetText();
-        
-        
-        taskList = new List<Task>();
-        taskList.Add( new Task( "Task 1", 1 ) );
-        taskList.Add( new Task( "Task 2", 2 ) );
-        taskList.Add( new Task( "Task 3", 3 ) );
-        taskList.Add( new Task( "Task 4", 4 ) );
-        
-        UpdateText();
-        
+        game = GameObject.FindWithTag( "Game Manager" ).GetComponent<GameManager>();
     }
 
     private void ResetText()
@@ -43,33 +29,28 @@ public class TaskWindow : MonoBehaviour
 
     private void UpdateText()
     {
-        for ( int i = 0; i < taskList.Count; i++ )
+        for ( int i = 0; i < game.Tasks.Count; i++ )
         {
-            textSlots[i].text = taskList[i].TaskName;
+            textSlots[i].text = game.Tasks[i].actionDescription;
         }
     }
-    
-    public void TaskCompleted(int ID)
+
+    public void UpdateTasks()
     {
-        bool success = false;
-        for ( int i = 0; i < taskList.Count; i++ )
+        for ( int i = 0; i < game.Tasks.Count; i++ )
         {
-            if ( taskList[i].TaskID == ID )
+            if ( !game.Tasks[i].IsAvailable )
             {
-                taskList[i].IsCompleted = true;
                 textSlots[i].fontStyle = FontStyles.Strikethrough;
                 textSlots[i].alpha = .5f;
-                success = true;
             }
         }
-
-        if ( !success )
-        {
-            Debug.LogError( "Task " + ID + " is invalid" );
-        }
-
+        
         //TODO: play scribbling-out noise
     }
+    
+    
+    
     
     
 }

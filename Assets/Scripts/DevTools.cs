@@ -55,7 +55,7 @@ public class MoonTrackerGameEditor : Editor
         GUI.backgroundColor = Color.green;
         if (GUILayout.Button("Start Game" ))
         {
-            editScript.StartGame();
+            editScript.StartAction();
         } 
         
         

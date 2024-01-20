@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class MoonTrackerGame : MonoBehaviour
+public class MoonTrackerGame : Action
 {
     public TextMeshProUGUI playerFeedback;
     public GameObject gamePiece, playArea, phasePanel, displayArea;
@@ -33,6 +33,7 @@ public class MoonTrackerGame : MonoBehaviour
         game = GetComponentInParent<GameManager>();
         placedPieces = new List<GameObject>();
         debugPieces = new List<GameObject>();
+        SetWindowActive( false );
         loadResources();
     }
     
@@ -107,8 +108,9 @@ public class MoonTrackerGame : MonoBehaviour
         phases[7] = Resources.Load<Sprite>( "Sprites/Moon Phases/Default/Waning Crescent" );
     }
     
-    public void StartGame()
+    public override void StartAction()
     {
+        SetWindowActive( true );
         //destroy any remaining moons to make sure screen is clear
         foreach ( Transform answerMoon in displayArea.transform )
         {
@@ -140,19 +142,32 @@ public class MoonTrackerGame : MonoBehaviour
         
     }
 
-    //Called by the submit button, checks if the answer is correct and tells the player what they did wrong
-    public void SubmitGame()
+    public override void CompleteAction()
     {
+        IsAvailable = false;
+        SetWindowActive( false );
+    }
+
+    //Enables/disables the canvas and interactability to show/hide the window
+    private void SetWindowActive(bool value)
+    {
+        GetComponent<Canvas>().enabled = value;
+        GetComponent<CanvasGroup>().interactable = value;
+    }
+
+    //Called by the submit button, checks if the answer is correct and tells the player what they did wrong
+    public void SubmitTask()
+    {
+        Debug.Log( "submit!" );
         string feedback = "";
         bool success = CheckAnswer( out feedback );
-
-        if ( !success )
-        {
-            feedback = "Wrong!: " +feedback;
-        }
-
         playerFeedback.text = feedback;
+        if ( success )
+        {
+            CompleteAction();
+        }
     }
+    
     
     //takes the list of moons placed and checks if the player matched the phases/locations
     public bool CheckAnswer(out string message)
