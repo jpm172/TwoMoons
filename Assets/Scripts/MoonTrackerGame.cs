@@ -144,7 +144,7 @@ public class MoonTrackerGame : Action
 
     public override void CompleteAction()
     {
-        IsAvailable = false;
+        SetUpdateAvailability( false );
         SetWindowActive( false );
     }
 

@@ -16,14 +16,19 @@ public class Action : MonoBehaviour
     public virtual void CompleteAction()
     {
     }
-    
-    public bool IsAvailable
+
+    //just sets availability without calling update action, used for initialization
+    public void SetAvailability( bool value )
     {
-        get => isAvailable;
-        set
-        {
-            isAvailable = value; 
-            GameObject.FindWithTag( "Game Manager" ).GetComponent<GameManager>().UpdateActions();
-        }
+        isAvailable = value;
     }
+
+    //sets availability and then updates this throughout the game
+    public void SetUpdateAvailability( bool value )
+    {
+        isAvailable = value; 
+        GameObject.FindWithTag( "Game Manager" ).GetComponent<GameManager>().UpdateActions();
+    }
+
+    public bool IsAvailable => isAvailable;
 }

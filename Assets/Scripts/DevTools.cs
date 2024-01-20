@@ -36,7 +36,7 @@ public class TaskWindowEditor : Editor
         GUI.backgroundColor = Color.green;
         if (GUILayout.Button("Complete Task" ))
         {
-            editScript.TaskCompleted( int.Parse( test ) );
+            //editScript.TaskCompleted( int.Parse( test ) );
         } 
         
     }

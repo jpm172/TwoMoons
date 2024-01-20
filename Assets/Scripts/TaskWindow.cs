@@ -11,10 +11,26 @@ public class TaskWindow : MonoBehaviour
     
     private TextMeshProUGUI[] textSlots;
     // Start is called before the first frame update
-    void Start()
+
+    public void InitializeTasks()
     {
         textSlots = taskContainer.GetComponentsInChildren<TextMeshProUGUI>();
         game = GameObject.FindWithTag( "Game Manager" ).GetComponent<GameManager>();
+
+        for ( int i = 0; i < textSlots.Length; i++ )
+        {
+            if ( i < game.Tasks.Count )
+            {
+                textSlots[i].text = game.Tasks[i].actionDescription;
+            }
+            else
+            {
+                textSlots[i].text = "";
+            }
+        }
+
+        UpdateTasks();
+        
     }
 
     private void ResetText()
@@ -27,14 +43,6 @@ public class TaskWindow : MonoBehaviour
         }
     }
 
-    private void UpdateText()
-    {
-        for ( int i = 0; i < game.Tasks.Count; i++ )
-        {
-            textSlots[i].text = game.Tasks[i].actionDescription;
-        }
-    }
-
     public void UpdateTasks()
     {
         for ( int i = 0; i < game.Tasks.Count; i++ )
@@ -43,6 +51,11 @@ public class TaskWindow : MonoBehaviour
             {
                 textSlots[i].fontStyle = FontStyles.Strikethrough;
                 textSlots[i].alpha = .5f;
+            }
+            else
+            {
+                textSlots[i].fontStyle = FontStyles.Normal;
+                textSlots[i].alpha = 1;
             }
         }
         

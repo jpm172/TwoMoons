@@ -34,10 +34,10 @@ public class GameManager : MonoBehaviour
     {
         gameImage.enabled = true;
         task_window = GetComponentInChildren<TaskWindow>();
-        locationUI.GetComponent<Canvas>().enabled = false ;
         moonCount = 2;
         actionButtonList = new List<Button>();
         tasks = new List<Action>();
+        
         initiateLevel();
     }
 
@@ -83,10 +83,11 @@ public class GameManager : MonoBehaviour
 
     public void initiateLevel()
     {
+        Debug.Log( "Initiate Level" );
         level = new List<LevelNode>();
 
-        loadResources();
-        initializeMoons();
+        LoadResources();
+        InitializeMoons();
         
         //Create the key locations
         LevelNode livingQuarters = new LevelNode( "Living Quarters", true, LQ_Main  );
@@ -94,18 +95,21 @@ public class GameManager : MonoBehaviour
         LevelNode overlook = new LevelNode( "Overlook", true, OL_Main );
         LevelNode woods = new LevelNode( "Woods", true, Woods_Main );
         LevelNode sanctuary = new LevelNode( "Sanctuary", true, SNTY_Main );
-        
+
         //assign actions/tasks
-        OL_Game.IsAvailable = true;
+        //Actions are things player CAN do, tasks are things player MUST do
+        OL_Game.SetAvailability( true );
         overlook.AddAction( OL_Game );
         AddTask(OL_Game);
+        
+        task_window.InitializeTasks();
         
         //Create the paths between the locations
         createPath( livingQuarters, observatory, LQ_to_OBS, OBS_to_LQ );
 
-        createBranch( livingQuarters, 4, observatory, 2, sanctuary, SNTY_to_path, path_to_SNTY );
-        createBranch( livingQuarters, 2, observatory, 4, woods, woods_to_path, path_to_woods );
-        createBranch(  observatory, 4, livingQuarters, 2,overlook, OL_to_path, path_to_OL );
+        CreateBranch( livingQuarters, 4, observatory, 2, sanctuary, SNTY_to_path, path_to_SNTY );
+        CreateBranch( livingQuarters, 2, observatory, 4, woods, woods_to_path, path_to_woods );
+        CreateBranch(  observatory, 4, livingQuarters, 2,overlook, OL_to_path, path_to_OL );
         
         //store the locations in the level list
         level.Add( livingQuarters );
@@ -132,7 +136,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    private void initializeMoons()
+    private void InitializeMoons()
     {
         moonPhases = new int[moonCount];
         moonPositions = new Vector3[moonCount];
@@ -144,7 +148,8 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    private void loadResources()
+    
+    private void LoadResources()
     {
         //load all the main sprites
         LQ_Main = Resources.Load<Sprite>( "Sprites/Living Quarters/Main/Living Quarters-Main" );
@@ -219,7 +224,7 @@ public class GameManager : MonoBehaviour
     }
     
     
-    private void createBranch( LevelNode leftLocation, int leftNodeIndex, LevelNode rightLocation, int rightNodeIndex, LevelNode branchLocation, Sprite[] forwardSprites, Sprite[] backwardSprites )
+    private void CreateBranch( LevelNode leftLocation, int leftNodeIndex, LevelNode rightLocation, int rightNodeIndex, LevelNode branchLocation, Sprite[] forwardSprites, Sprite[] backwardSprites )
     {
         LevelNode leftNode = leftLocation.getNodeAt( leftNodeIndex );
         LevelNode rightNode = rightLocation.getNodeAt( rightNodeIndex );
@@ -449,6 +454,7 @@ public class GameManager : MonoBehaviour
                 buttonText.alpha = 1;
             }
         }
+        task_window.UpdateTasks();
     }
     
     //ExitLocation will force the player into the forward node and wipe all the buttons
