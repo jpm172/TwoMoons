@@ -216,6 +216,15 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Open Taskbar"",
+                    ""type"": ""Button"",
+                    ""id"": ""f0432790-b0c6-40c2-b009-a9ef03a1e9ba"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -240,6 +249,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""818b145b-1d37-4424-b398-48d5dc9a3250"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Open Taskbar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -258,6 +278,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
         m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
+        m_UI_OpenTaskbar = m_UI.FindAction("Open Taskbar", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -392,12 +413,14 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private IUIActions m_UIActionsCallbackInterface;
     private readonly InputAction m_UI_Click;
     private readonly InputAction m_UI_Point;
+    private readonly InputAction m_UI_OpenTaskbar;
     public struct UIActions
     {
         private @Controls m_Wrapper;
         public UIActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Click => m_Wrapper.m_UI_Click;
         public InputAction @Point => m_Wrapper.m_UI_Point;
+        public InputAction @OpenTaskbar => m_Wrapper.m_UI_OpenTaskbar;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -413,6 +436,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Point.started -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
                 @Point.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
                 @Point.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
+                @OpenTaskbar.started -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
+                @OpenTaskbar.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
+                @OpenTaskbar.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
             }
             m_Wrapper.m_UIActionsCallbackInterface = instance;
             if (instance != null)
@@ -423,6 +449,9 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Point.started += instance.OnPoint;
                 @Point.performed += instance.OnPoint;
                 @Point.canceled += instance.OnPoint;
+                @OpenTaskbar.started += instance.OnOpenTaskbar;
+                @OpenTaskbar.performed += instance.OnOpenTaskbar;
+                @OpenTaskbar.canceled += instance.OnOpenTaskbar;
             }
         }
     }
@@ -440,5 +469,6 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     {
         void OnClick(InputAction.CallbackContext context);
         void OnPoint(InputAction.CallbackContext context);
+        void OnOpenTaskbar(InputAction.CallbackContext context);
     }
 }

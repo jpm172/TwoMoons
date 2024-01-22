@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TaskWindow : MonoBehaviour
 {
@@ -10,7 +12,92 @@ public class TaskWindow : MonoBehaviour
     //public List<Task> taskList;
     
     private TextMeshProUGUI[] textSlots;
-    // Start is called before the first frame update
+    private Controls playerControls;
+
+    private InputAction openTaskbarAction;
+    private bool isTransitioning;
+    
+    private void Awake()
+    {
+        playerControls = new Controls();
+        GetComponent<Canvas>().enabled = false;
+        GetComponent<CanvasGroup>().interactable = false;
+    }
+    
+    
+    private void OnEnable()
+    {
+        openTaskbarAction = playerControls.UI.OpenTaskbar;
+
+        openTaskbarAction.Enable();
+
+        openTaskbarAction.performed += ToggleTaskbar;
+    }
+
+    private void OnDisable()
+    {
+        openTaskbarAction.Disable();
+    }
+
+
+    private void ToggleTaskbar(InputAction.CallbackContext context)
+    {
+
+        Canvas canvas = GetComponent<Canvas>();
+        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
+
+        if ( isTransitioning )
+            return;
+        
+        
+        if ( !canvas.enabled )//fade in
+        {
+            StartCoroutine( FadeIn( .5f, canvasGroup, canvas ) );
+        }
+        else// fade out
+        {
+            StartCoroutine( FadeOut(.5f, canvasGroup, canvas) );
+
+        }
+        //canvas.enabled = !canvas.enabled;
+        //canvasGroup.interactable = !canvasGroup.interactable;
+        
+    }
+
+
+    private IEnumerator FadeIn(float time, CanvasGroup cg, Canvas canvas)
+    {
+        time = Mathf.Max( time, .1f );
+        float timer = 0;
+        isTransitioning = true;
+        canvas.enabled = true;
+        
+        while ( timer < 1 )
+        {
+            cg.alpha = Mathf.SmoothStep( 0, 1, timer );
+            timer += Time.deltaTime* (1/time);
+            yield return null;
+        }
+        isTransitioning = false;
+        cg.alpha = 1;
+    }
+    
+    private IEnumerator FadeOut(float time, CanvasGroup cg, Canvas canvas)
+    {
+        time = Mathf.Max( time, .1f );
+        float timer = 0;
+        isTransitioning = true;
+        
+        while ( timer < 1 )
+        {
+            cg.alpha = Mathf.SmoothStep( 1, 0, timer );
+            timer += Time.deltaTime * (1/time);
+            yield return null;
+        }
+        isTransitioning = false;
+        cg.alpha = 0;
+        canvas.enabled = false;
+    }
 
     public void InitializeTasks()
     {

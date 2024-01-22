@@ -101,6 +101,11 @@ public class GameManager : MonoBehaviour
         OL_Game.SetAvailability( true );
         overlook.AddAction( OL_Game );
         AddTask(OL_Game);
+
+        Action sleepAction = gameObject.AddComponent<SleepAction>();
+        sleepAction.SetAvailability( true );
+        sleepAction.actionName = "Sleep";
+        livingQuarters.AddAction( sleepAction );
         
         task_window.InitializeTasks();
         
@@ -541,6 +546,11 @@ public class GameManager : MonoBehaviour
             gameImage.sprite = playerPosition.sprite;
             PlayerMoved();
         }
+    }
+
+    public void StartNewDay()
+    {
+        Debug.Log( "NEW DAY" );
     }
 
 

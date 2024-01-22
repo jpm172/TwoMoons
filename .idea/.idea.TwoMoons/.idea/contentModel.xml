@@ -20,6 +20,7 @@
           <e p="Minigame.cs" t="Include" />
           <e p="MoonTrackerGame.cs" t="Include" />
           <e p="RectTransformExtensions.cs" t="Include" />
+          <e p="SleepAction.cs" t="Include" />
           <e p="Task.cs" t="Include" />
           <e p="TaskWindow.cs" t="Include" />
           <e p="TextboxHandler.cs" t="Include" />
