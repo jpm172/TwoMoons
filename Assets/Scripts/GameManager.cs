@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public Sprite LQ_Main, OBS_Main, Woods_Main, OL_Main, SNTY_Main;
     public GameObject locationUI, movementUI, actionButton, actionBox;
     public Image gameImage, forwardArrow, backwardArrow, leftArrow, rightArrow;
-    public Action OL_Game;
+    public Action OL_Game, OBS_Game;
     
     public int moonCount, day;
     public Vector3[] moonPositions;
@@ -107,6 +107,10 @@ public class GameManager : MonoBehaviour
         sleepAction.actionName = "Sleep";
         livingQuarters.AddAction( sleepAction );
         
+        
+        OBS_Game.SetAvailability( true );
+        observatory.AddAction( OBS_Game );
+        AddTask( OBS_Game );
         task_window.InitializeTasks();
         
         //Create the paths between the locations

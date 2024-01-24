@@ -60,5 +60,24 @@ public class MoonTrackerGameEditor : Editor
         
         
     }
+}
 
+[CustomEditor( typeof( AnomalyFinderGame ) ) ]
+public class AnomalyFinderGameEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        
+        DrawDefaultInspector();
+
+        AnomalyFinderGame editScript = (AnomalyFinderGame) target;
+        
+        GUI.backgroundColor = Color.green;
+        if (GUILayout.Button("Start Game" ))
+        {
+            editScript.StartAction();
+        } 
+        
+        
+    }
 }
