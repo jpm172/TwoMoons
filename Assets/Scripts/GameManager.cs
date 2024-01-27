@@ -111,6 +111,7 @@ public class GameManager : MonoBehaviour
         OBS_Game.SetAvailability( true );
         observatory.AddAction( OBS_Game );
         AddTask( OBS_Game );
+        
         task_window.InitializeTasks();
         
         //Create the paths between the locations

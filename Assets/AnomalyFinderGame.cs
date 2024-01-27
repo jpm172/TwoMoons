@@ -21,7 +21,7 @@ public class AnomalyFinderGame : Action
         audio.clip = noiseSound;
         audio.loop = true;
         audio.playOnAwake = false;
-        //SetWindowActive( false );
+        SetWindowActive( true );
         
     }
 
@@ -34,13 +34,14 @@ public class AnomalyFinderGame : Action
     }
 
 
-    //TODO add secondary clicking noise when getting really close to the anomaly
+    //TODO: add secondary clicking noise when getting really close to the anomaly
+    //BUG: the position of the anomaly doesnt appear to be calculated correctly for distance calculations
     //Adjusts the volume of the sound effects according to how close the anomaly is to the play area
     private void SoundEffects()
     {
+        Vector2 vec = scrollArea.transform.localPosition  + (spawnedAnomaly.transform.localPosition);
         //calculate the distance between the anomaly and the center of the play area
-        float dist = Vector2.Distance(Vector2.zero, scrollArea.transform.localPosition + spawnedAnomaly.transform.localPosition);
-        dist = Mathf.Max( dist, 1 );
+        float dist = Vector2.Distance(Vector2.zero, vec);
 
         //calculate how loud the noise should be according to the distance
         float progress =  1 - ( dist / threshold );
@@ -60,15 +61,17 @@ public class AnomalyFinderGame : Action
         {
             Destroy( spawnedAnomaly );
         }
-        
+
+
         //randomly spawn an anomaly within the scroll area, while keeping a buffer zone from the edge of the scroll area
-        float xRange = ( scrollAreaRect.width * .9f ) / 2;
-        float yRange = ( scrollAreaRect.height * .9f ) / 2;
+        float xRange = ( scrollAreaRect.width * .8f ) / 2;
+        float yRange = ( scrollAreaRect.height * .8f ) / 2;
         float randX = UnityEngine.Random.Range( -xRange, xRange );
         float randY = UnityEngine.Random.Range( -yRange, yRange );
         
         Vector3 randomPos = new Vector2(randX, randY);
-        spawnedAnomaly = Instantiate( anomalyObject, scrollArea.transform.position + randomPos, Quaternion.identity, scrollArea.transform );
+        spawnedAnomaly = Instantiate( anomalyObject, scrollArea.transform.position, Quaternion.identity, scrollArea.transform );
+        spawnedAnomaly.transform.localPosition = randomPos;
         
     }
 
