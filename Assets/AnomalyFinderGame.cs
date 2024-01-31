@@ -6,21 +6,28 @@ using Random = System.Random;
 
 public class AnomalyFinderGame : Action
 {
-    public AudioClip noiseSound;
+    public AudioClip noiseSound, clickingSound;
     public GameObject anomalyObject, scrollArea, playArea;
 
-    public float threshold, minVolume;
+    public float mainThreshold, clickingThreshold, minVolume;
     
-    private AudioSource audio;
+    private AudioSource audio1, audio2;
     
     private GameObject spawnedAnomaly;
 
     void Start()
     {
-        audio = GetComponent<AudioSource>();
-        audio.clip = noiseSound;
-        audio.loop = true;
-        audio.playOnAwake = false;
+        //add audio sources for each clip that needs to be played
+        audio1 = gameObject.AddComponent<AudioSource>();
+        audio1.clip = noiseSound;
+        audio1.loop = true;
+        audio1.playOnAwake = false;
+        
+        audio2 = gameObject.AddComponent<AudioSource>();
+        audio2.clip = clickingSound;
+        audio2.loop = true;
+        audio2.playOnAwake = false;
+        
         SetWindowActive( true );
         
     }
@@ -44,10 +51,14 @@ public class AnomalyFinderGame : Action
         float dist = Vector2.Distance(Vector2.zero, vec);
 
         //calculate how loud the noise should be according to the distance
-        float progress =  1 - ( dist / threshold );
-        float volume = ExpSmoothingCurve( 7, progress );
+        float mainProgress =  1 - ( dist / mainThreshold );
+        float mainVolume = ExpSmoothingCurve( 7, mainProgress );
+        
+        float clickingProgress = 1 - ( dist / clickingThreshold );
+        float clickingVolume = ExpSmoothingCurve( 10, clickingProgress );
 
-        audio.volume = Mathf.Max( minVolume,  volume);
+        audio1.volume = Mathf.Max( minVolume,  mainVolume);//main noise
+        audio2.volume = Mathf.Max( 0, clickingVolume );//clicking
     }
 
     public override void StartAction()
@@ -55,7 +66,9 @@ public class AnomalyFinderGame : Action
         Rect scrollAreaRect = scrollArea.GetComponent<RectTransform>().rect;
         
         SetWindowActive( true );
-        audio.Play();
+        
+        audio1.Play();
+        audio2.Play();
 
         if ( spawnedAnomaly != null )
         {
@@ -119,15 +132,19 @@ public class AnomalyFinderGame : Action
     {
         time = Mathf.Max( time, .1f );
         float timer = 0;
-        float curVolume = audio.volume;
+        float curVolume = audio1.volume;
         
         while ( timer < 1 )
         {
-            audio.volume = curVolume - ExpSmoothingCurve( 7, timer );
+            float newVolume = curVolume - ExpSmoothingCurve( 7, timer );
+            audio1.volume = newVolume;
+            audio2.volume = newVolume;
+            
             timer += Time.deltaTime * (1/time);
             yield return null;
         }
 
-        audio.Stop();
+        audio1.Stop();
+        audio2.Stop();
     }
 }
