@@ -46,22 +46,20 @@ public class TaskWindow : MonoBehaviour
         Canvas canvas = GetComponent<Canvas>();
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
 
+        //this check prevents spamming the task bar button from causing visual glitches
         if ( isTransitioning )
             return;
         
         
-        if ( !canvas.enabled )//fade in
+        if ( !canvas.enabled )
         {
             StartCoroutine( FadeIn( .5f, canvasGroup, canvas ) );
         }
-        else// fade out
+        else
         {
             StartCoroutine( FadeOut(.5f, canvasGroup, canvas) );
-
         }
-        //canvas.enabled = !canvas.enabled;
-        //canvasGroup.interactable = !canvasGroup.interactable;
-        
+
     }
 
 
@@ -71,6 +69,7 @@ public class TaskWindow : MonoBehaviour
         float timer = 0;
         isTransitioning = true;
         canvas.enabled = true;
+        cg.interactable = true;
         
         while ( timer < 1 )
         {
@@ -96,6 +95,7 @@ public class TaskWindow : MonoBehaviour
         }
         isTransitioning = false;
         cg.alpha = 0;
+        cg.interactable = false;
         canvas.enabled = false;
     }
 
