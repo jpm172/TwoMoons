@@ -81,3 +81,30 @@ public class AnomalyFinderGameEditor : Editor
         
     }
 }
+
+[CustomEditor( typeof( Settings ) ) ]
+public class SettingsEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        
+        DrawDefaultInspector();
+
+        Settings editScript = (Settings) target;
+        
+        //GUI.backgroundColor = new Color(255, 172, 28);
+        GUI.backgroundColor = new Color(1, .674f, .1f);
+        if (GUILayout.Button("Save Settings",GUILayout.Width(100) ))
+        {
+            editScript.SaveSettings();
+        } 
+        
+        GUI.backgroundColor = Color.blue;
+        if (GUILayout.Button("Load Settings",GUILayout.Width(100) ))
+        {
+            editScript.LoadSettings();
+        } 
+        
+        
+    }
+}

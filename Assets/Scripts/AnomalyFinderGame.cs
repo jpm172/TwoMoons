@@ -15,8 +15,14 @@ public class AnomalyFinderGame : Action
     
     private GameObject spawnedAnomaly;
 
+    private Settings settings;
+
+    
+    
     void Start()
     {
+        settings = GetComponentInParent<Settings>();
+        
         //add audio sources for each clip that needs to be played
         audio1 = gameObject.AddComponent<AudioSource>();
         audio1.clip = noiseSound;
@@ -38,6 +44,7 @@ public class AnomalyFinderGame : Action
         {
             SoundEffects();
         }
+
     }
 
 
@@ -57,11 +64,11 @@ public class AnomalyFinderGame : Action
         float clickingProgress = 1 - ( dist / clickingThreshold );
         float clickingVolume = ExpSmoothingCurve( 10, clickingProgress );
 
-        audio1.volume = Mathf.Max( minVolume,  mainVolume);//main noise
-        audio2.volume = Mathf.Max( 0, clickingVolume );//clicking
+        audio1.volume = settings.SfxVolume * settings.MasterVolume * Mathf.Max( minVolume,  mainVolume);//main noise
+        audio2.volume = settings.SfxVolume * settings.MasterVolume * Mathf.Max( 0, clickingVolume );//clicking
     }
 
-    public override void StartAction()
+    public override void StartAction() 
     {
         Rect scrollAreaRect = scrollArea.GetComponent<RectTransform>().rect;
         

@@ -196,9 +196,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Open Taskbar",
+                    "name": "Taskbar",
                     "type": "Button",
                     "id": "f0432790-b0c6-40c2-b009-a9ef03a1e9ba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Settings",
+                    "type": "Button",
+                    "id": "588d4051-cd13-4548-b33b-cec2064827f4",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -235,7 +244,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Open Taskbar",
+                    "action": "Taskbar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d40a6fca-f08f-4e6b-a582-3beda6f9cd84",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Settings",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

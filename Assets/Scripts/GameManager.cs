@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]private List<Action> tasks;
     [SerializeField]private LevelNode playerPosition, prevPlayerPosition;
     private TaskWindow task_window;
+    private Settings settings;
 
     private List<Button> actionButtonList;
     
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
+        settings = GetComponent<Settings>();
         gameImage.enabled = true;
         task_window = GetComponentInChildren<TaskWindow>();
         moonCount = 2;
@@ -487,6 +489,12 @@ public class GameManager : MonoBehaviour
     
     public void moveForward( InputAction.CallbackContext context )
     {
+        //if at a location or paused, ignore movement inputs
+        if ( playerPosition.isLocation || settings.IsPaused )
+        {
+            return;
+        }
+
         if ( playerPosition.forward != null )
         {
             //Debug.Log( "Move Forward" );
@@ -499,8 +507,8 @@ public class GameManager : MonoBehaviour
 
     public void moveBackward( InputAction.CallbackContext context )
     {
-        //if at a location, ignore movement inputs
-        if ( playerPosition.isLocation )
+        //if at a location or paused, ignore movement inputs
+        if ( playerPosition.isLocation || settings.IsPaused )
         {
             return;
         }
@@ -517,8 +525,8 @@ public class GameManager : MonoBehaviour
 
     public void moveLeft( InputAction.CallbackContext context )
     {
-        //if at a location, ignore movement inputs
-        if ( playerPosition.isLocation )
+        //if at a location or paused, ignore movement inputs
+        if ( playerPosition.isLocation || settings.IsPaused )
         {
             return;
         }
@@ -537,8 +545,8 @@ public class GameManager : MonoBehaviour
 
     public void moveRight( InputAction.CallbackContext context )
     {
-        //if at a location, ignore movement inputs
-        if ( playerPosition.isLocation )
+        //if at a location or paused, ignore movement inputs
+        if ( playerPosition.isLocation || settings.IsPaused )
         {
             return;
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,18 +17,24 @@ public class TaskWindow : MonoBehaviour
 
     private InputAction openTaskbarAction;
     private bool isTransitioning;
-    
+
+
+    private void Start()
+    {
+        GetComponent<Canvas>().enabled = false;
+        GetComponent<CanvasGroup>().interactable = false;
+    }
+
     private void Awake()
     {
         playerControls = new Controls();
-        GetComponent<Canvas>().enabled = false;
-        GetComponent<CanvasGroup>().interactable = false;
+
     }
     
     
     private void OnEnable()
     {
-        openTaskbarAction = playerControls.UI.OpenTaskbar;
+        openTaskbarAction = playerControls.UI.Taskbar;
 
         openTaskbarAction.Enable();
 

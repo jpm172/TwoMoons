@@ -16,6 +16,10 @@ public class MoonTrackerGame : Action
     
     
     private GameManager game;
+    private Settings settings;
+    private CanvasGroup canvasGroup;
+    private Canvas canvas;
+    
     private Sprite newMoon, waxingCrescent, firstQuarter, waxingGibbous, fullMoon, waningGibbous, thirdQuarter, waningCrescent;
     private Sprite[] phases;
     
@@ -31,8 +35,14 @@ public class MoonTrackerGame : Action
     void Start()
     {
         game = GetComponentInParent<GameManager>();
+        settings = GetComponentInParent<Settings>();
+        
+        canvasGroup = GetComponent<CanvasGroup>();
+        canvas = GetComponent<Canvas>();
+        
         placedPieces = new List<GameObject>();
         debugPieces = new List<GameObject>();
+        
         SetWindowActive( false );
         loadResources();
     }
@@ -56,6 +66,12 @@ public class MoonTrackerGame : Action
     // Update is called once per frame
     void Update()
     {
+        //if the canvas is enabled, then that means the game is active
+        if ( canvas.enabled )
+        {
+            //make sure the canvas is not interactcable when the game is paused
+            canvasGroup.interactable = !settings.IsPaused;
+        }
         
         DebugMode();
         //whenever the mouse button is released, try and release any game pieces held

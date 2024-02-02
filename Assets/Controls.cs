@@ -218,9 +218,18 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Open Taskbar"",
+                    ""name"": ""Taskbar"",
                     ""type"": ""Button"",
                     ""id"": ""f0432790-b0c6-40c2-b009-a9ef03a1e9ba"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Settings"",
+                    ""type"": ""Button"",
+                    ""id"": ""588d4051-cd13-4548-b33b-cec2064827f4"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -257,7 +266,18 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Open Taskbar"",
+                    ""action"": ""Taskbar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d40a6fca-f08f-4e6b-a582-3beda6f9cd84"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Settings"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -278,7 +298,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Click = m_UI.FindAction("Click", throwIfNotFound: true);
         m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
-        m_UI_OpenTaskbar = m_UI.FindAction("Open Taskbar", throwIfNotFound: true);
+        m_UI_Taskbar = m_UI.FindAction("Taskbar", throwIfNotFound: true);
+        m_UI_Settings = m_UI.FindAction("Settings", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -413,14 +434,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private IUIActions m_UIActionsCallbackInterface;
     private readonly InputAction m_UI_Click;
     private readonly InputAction m_UI_Point;
-    private readonly InputAction m_UI_OpenTaskbar;
+    private readonly InputAction m_UI_Taskbar;
+    private readonly InputAction m_UI_Settings;
     public struct UIActions
     {
         private @Controls m_Wrapper;
         public UIActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Click => m_Wrapper.m_UI_Click;
         public InputAction @Point => m_Wrapper.m_UI_Point;
-        public InputAction @OpenTaskbar => m_Wrapper.m_UI_OpenTaskbar;
+        public InputAction @Taskbar => m_Wrapper.m_UI_Taskbar;
+        public InputAction @Settings => m_Wrapper.m_UI_Settings;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -436,9 +459,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Point.started -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
                 @Point.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
                 @Point.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnPoint;
-                @OpenTaskbar.started -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
-                @OpenTaskbar.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
-                @OpenTaskbar.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnOpenTaskbar;
+                @Taskbar.started -= m_Wrapper.m_UIActionsCallbackInterface.OnTaskbar;
+                @Taskbar.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnTaskbar;
+                @Taskbar.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnTaskbar;
+                @Settings.started -= m_Wrapper.m_UIActionsCallbackInterface.OnSettings;
+                @Settings.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnSettings;
+                @Settings.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnSettings;
             }
             m_Wrapper.m_UIActionsCallbackInterface = instance;
             if (instance != null)
@@ -449,9 +475,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Point.started += instance.OnPoint;
                 @Point.performed += instance.OnPoint;
                 @Point.canceled += instance.OnPoint;
-                @OpenTaskbar.started += instance.OnOpenTaskbar;
-                @OpenTaskbar.performed += instance.OnOpenTaskbar;
-                @OpenTaskbar.canceled += instance.OnOpenTaskbar;
+                @Taskbar.started += instance.OnTaskbar;
+                @Taskbar.performed += instance.OnTaskbar;
+                @Taskbar.canceled += instance.OnTaskbar;
+                @Settings.started += instance.OnSettings;
+                @Settings.performed += instance.OnSettings;
+                @Settings.canceled += instance.OnSettings;
             }
         }
     }
@@ -469,6 +498,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     {
         void OnClick(InputAction.CallbackContext context);
         void OnPoint(InputAction.CallbackContext context);
-        void OnOpenTaskbar(InputAction.CallbackContext context);
+        void OnTaskbar(InputAction.CallbackContext context);
+        void OnSettings(InputAction.CallbackContext context);
     }
 }
